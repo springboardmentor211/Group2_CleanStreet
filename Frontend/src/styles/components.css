@@ -1,0 +1,245 @@
+/* ===== REUSABLE COMPONENTS ===== */
+
+/* BUTTONS */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary-blue);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8; /* Darker blue */
+  text-decoration: none;
+}
+
+.btn-secondary {
+  background-color: var(--white);
+  color: var(--dark-text);
+  border-color: var(--medium-gray);
+}
+
+.btn-secondary:hover {
+  background-color: var(--light-gray);
+  text-decoration: none;
+}
+
+/* INPUT FIELDS */
+.input-group {
+  margin-bottom: var(--space-lg);
+}
+
+.input-label {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-weight: 500;
+  color: var(--dark-text);
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--dark-text);
+  background-color: var(--white);
+  border: 1px solid var(--medium-gray);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* CARDS */
+.card {
+  background-color: var(--white);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--medium-gray);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-lg);
+}
+
+/* NAVIGATION */
+.navbar {
+  background-color: var(--white);
+  border-bottom: 1px solid var(--medium-gray);
+  padding: var(--space-md) 0;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+.nav-link {
+  color: var(--muted-text);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: var(--primary-blue);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav-container {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .container {
+    padding: 0 var(--space-sm);
+  }
+}
+/* ===== ICON STYLES ===== */
+.input-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-text);
+  font-size: 1.1rem;
+}
+
+.input-field {
+  padding-left: 48px !important;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn.full-width {
+  width: 100%;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error States */
+.input-wrapper.error .input-field {
+  border-color: #ef4444;
+}
+
+.input-wrapper.error .input-icon {
+  color: #ef4444;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+/* Stat Cards */
+.stat-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--medium-gray);
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.stat-icon {
+  font-size: 2rem;
+  padding: 12px;
+  border-radius: var(--radius-md);
+}
+
+.stat-icon.total {
+  color: var(--primary-blue);
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+.stat-icon.pending {
+  color: var(--pending);
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.stat-icon.progress {
+  color: var(--in-progress);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.stat-icon.resolved {
+  color: var(--resolved);
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.stat-content h3 {
+  font-size: 2rem;
+  margin: 0;
+  color: var(--dark-text);
+}
+
+.stat-content p {
+  margin: 0;
+  color: var(--muted-text);
+  font-size: 0.9rem;
+}
