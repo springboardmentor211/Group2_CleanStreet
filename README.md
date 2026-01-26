@@ -422,6 +422,14 @@ npm run preview
 | Frontend Pages | 24 | All page components |
 | Frontend Context | 1 | Authentication state |
 
+
+
+
+
+
+
+****************** IGNORE THE CLINET FOLDER THAT IS A DUMMY FOLDER FOR UI (DELETE THAT FOLDER) ***************
+
 ---
 
 ## License
