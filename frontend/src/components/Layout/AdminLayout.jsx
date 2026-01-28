@@ -31,7 +31,8 @@ import {
   Notifications as NotificationsIcon,
   AdminPanelSettings as AdminIcon,
   Logout as LogoutIcon,
-  Groups as GroupsIcon
+  Groups as GroupsIcon,
+  VolunteerActivism as VolunteerIcon
 } from '@mui/icons-material'
 import { useNavigate, useLocation } from 'react-router-dom'
 import logoSvg from '../../assets/images/logo.svg'
@@ -90,6 +91,11 @@ const AdminLayout = ({ children }) => {
       path: isAdminSubdomain ? '/dashboard' : '/admin/dashboard' 
     },
     { 
+      text: 'Pending Volunteers', 
+      icon: <VolunteerIcon />, 
+      path: isAdminSubdomain ? '/pending-volunteers' : '/admin/pending-volunteers' 
+    },
+    { 
       text: 'Community', 
       icon: <GroupsIcon />, 
       path: isAdminSubdomain ? '/community' : '/admin/community' 
@@ -98,6 +104,11 @@ const AdminLayout = ({ children }) => {
       text: 'Users', 
       icon: <PeopleIcon />, 
       path: isAdminSubdomain ? '/users' : '/admin/users' 
+    },
+    { 
+      text: 'Volunteers', 
+      icon: <VolunteerIcon />, 
+      path: isAdminSubdomain ? '/volunteers' : '/admin/volunteers' 
     },
     { 
       text: 'Reports', 

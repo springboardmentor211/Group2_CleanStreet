@@ -494,6 +494,7 @@ import {
   useTheme, useMediaQuery
 } from '@mui/material'
 import { Link, useNavigate } from 'react-router-dom'
+import { redirectToSubdomain } from '../utils/subdomain'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import ReportIcon from '@mui/icons-material/Report'
 import TrackChangesIcon from '@mui/icons-material/TrackChanges'
@@ -1059,6 +1060,70 @@ const Home = () => {
           </Grid>
         </Container>
       </Box>
+
+      {/* Volunteer CTA Section */}
+      <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10 } }}>
+        <Paper
+          sx={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white',
+            border: 'none',
+            borderRadius: 4,
+            p: { xs: 3, md: 6 },
+            mb: 4
+          }}
+        >
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs={12} md={8}>
+              <Typography variant="h4" fontWeight="bold" gutterBottom>
+                Make a Bigger Impact - Become a Volunteer!
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2, opacity: 0.9 }}>
+                Join our community of volunteers helping to keep our streets clean. Get access to exclusive events, earn badges, and lead cleanup initiatives.
+              </Typography>
+              <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+                <Button 
+                  variant="contained" 
+                  sx={{ 
+                    bgcolor: 'white', 
+                    color: '#667eea',
+                    fontWeight: 600,
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' }
+                  }}
+                  onClick={() => redirectToSubdomain('volunteer', '/')}
+                >
+                  Learn More
+                </Button>
+                <Button 
+                  variant="outlined" 
+                  sx={{ 
+                    borderColor: 'white', 
+                    color: 'white',
+                    fontWeight: 600,
+                    '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
+                  }}
+                  onClick={() => redirectToSubdomain('volunteer', '/register/basic')}
+                >
+                  Sign Up Now
+                </Button>
+              </Stack>
+            </Grid>
+            <Grid item xs={12} md={4} sx={{ textAlign: 'center' }}>
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center',
+                gap: 2 
+              }}>
+                <Box sx={{ fontSize: 80 }}>🙌</Box>
+                <Typography variant="h6" fontWeight="bold">
+                  Join 500+ Volunteers
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Container>
 
       {/* Stats Section */}
       <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10 }, mt: -4 }}>

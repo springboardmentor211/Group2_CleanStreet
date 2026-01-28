@@ -46,20 +46,11 @@ export const AuthProvider = ({ children }) => {
       })
       
       setUser(response.data.user)
-      toast.success('Login successful!')
-      
-      // Redirect based on role
-      if (response.data.user.role === 'admin') {
-        window.location.href = import.meta.env.VITE_ADMIN_URL
-      } else {
-        navigate('/dashboard')
-      }
       
       return { success: true, user: response.data.user }
     } catch (error) {
       const message = error.response?.data?.error || 'Login failed'
-      toast.error(message)
-      return { success: false, error: message }
+      throw error
     }
   }
 
@@ -181,6 +172,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin' || user?.role === 'super-admin',
     isSuperAdmin: user?.isSuperAdmin === true,
+    isVolunteer: user?.role === 'volunteer',
     login,
     adminLogin,
     register,

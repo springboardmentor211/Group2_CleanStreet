@@ -724,7 +724,11 @@ import {
   TrendingUp,
   BugReport,
   CleanHands,
-  LocationOn
+  LocationOn,
+  VolunteerActivism as Volunteer,
+  Event,
+  CalendarToday,
+  AssignmentTurnedIn
 } from '@mui/icons-material'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { styled } from '@mui/material/styles'
@@ -855,7 +859,10 @@ const MainLayout = ({ children, toggleColorMode }) => {
         'my-reports': 'My Reports',
         'report-issue': 'Report Issue',
         'dashboard': 'Dashboard',
-        'settings': 'Settings'
+        'settings': 'Settings',
+        'volunteer': 'Volunteer',
+        'events': 'Events',
+        'my-events': 'My Events'
       }
       
       const label = labelMap[value] || value.charAt(0).toUpperCase() + value.slice(1)
@@ -938,10 +945,24 @@ const MainLayout = ({ children, toggleColorMode }) => {
 
   const navItems = [
     { 
+      label: 'Home', 
+      path: '/home', 
+      icon: <Home />, 
+      show: user?.role === 'volunteer',
+      color: 'primary'
+    },
+    { 
       label: 'Dashboard', 
       path: '/dashboard', 
       icon: <Dashboard />, 
-      show: true,
+      show: user?.role !== 'volunteer',
+      color: 'primary'
+    },
+    { 
+      label: 'Volunteer Dashboard', 
+      path: '/dashboard', 
+      icon: <Volunteer />, 
+      show: user?.role === 'volunteer',
       color: 'primary'
     },
     { 
@@ -955,40 +976,61 @@ const MainLayout = ({ children, toggleColorMode }) => {
       label: 'My Reports', 
       path: '/my-reports', 
       icon: <History />, 
-      show: true,
+      show: user?.role !== 'volunteer',
+      color: 'info'
+    },
+    { 
+      label: 'Volunteer Reports', 
+      path: '/reports', 
+      icon: <AssignmentTurnedIn />, 
+      show: user?.role === 'volunteer',
+      color: 'success'
+    },
+    { 
+      label: 'Events', 
+      path: '/events', 
+      icon: <Event />, 
+      show: user?.role === 'volunteer',
+      color: 'secondary'
+    },
+    { 
+      label: 'My Events', 
+      path: '/my-events', 
+      icon: <CalendarToday />, 
+      show: user?.role === 'volunteer',
       color: 'info'
     },
     { 
       label: 'Report Issue', 
       path: '/report-issue', 
       icon: <CleanHands />, 
-      show: true,
+      show: user?.role !== 'volunteer',
       color: 'success'
     },
     { 
       label: 'Map', 
       path: '/map', 
       icon: <Map />, 
-      show: true,
+      show: user?.role !== 'volunteer',
       color: 'secondary'
     },
     { 
       label: 'Activity', 
       path: '/activity', 
       icon: <Timeline />, 
-      show: true,
+      show: user?.role !== 'volunteer',
       color: 'info'
     },
     { 
       label: 'Analytics', 
       path: '/analytics', 
       icon: <TrendingUp />, 
-      show: true,
+      show: user?.role !== 'volunteer',
       color: 'warning'
     },
     { 
       label: 'Profile', 
-      path: '/profile', 
+      path: user?.role === 'volunteer' ? '/volunteer/profile' : '/profile', 
       icon: <Person />, 
       show: true,
       color: 'primary'

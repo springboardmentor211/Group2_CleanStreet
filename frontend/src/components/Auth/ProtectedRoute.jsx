@@ -3,7 +3,12 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { CircularProgress, Box } from '@mui/material'
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
+const ProtectedRoute = ({ 
+  children, 
+  adminOnly = false, 
+  allowedRoles = null,
+  requireVolunteerVerified = false 
+}) => {
   const { user, loading, isAuthenticated, isAdmin } = useAuth()
 
   if (loading) {
@@ -27,6 +32,19 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
   if (adminOnly && !isAdmin) {
     return <Navigate to="/dashboard" replace />
+  }
+
+  if (Array.isArray(allowedRoles) && allowedRoles.length > 0) {
+    if (!allowedRoles.includes(user?.role)) {
+      return <Navigate to="/dashboard" replace />
+    }
+  }
+
+  // Check if volunteer verification is required
+  if (requireVolunteerVerified && user?.role === 'volunteer') {
+    if (user?.volunteer_status !== 'active') {
+      return <Navigate to="/verification-pending" replace />
+    }
   }
 
   return children

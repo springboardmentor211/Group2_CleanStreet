@@ -141,7 +141,9 @@ router.post('/login', authLimiter, (req, res, next) => {
           name: user.name,
           role: user.role,
           profilePicture: user.profilePicture,
-          isEmailVerified: user.isEmailVerified
+          isEmailVerified: user.isEmailVerified,
+          volunteer_tier: user.volunteer_tier,
+          volunteer_status: user.volunteer_status
         }
       })
     })
@@ -208,7 +210,10 @@ router.post('/verify-email', otpRequestLimiter, [
       user: {
         id: user._id,
         email: user.email,
-        name: user.name
+        name: user.name,
+        role: user.role,
+        volunteer_tier: user.volunteer_tier,
+        volunteer_status: user.volunteer_status
       }
     })
   } catch (error) {
@@ -333,6 +338,9 @@ router.get('/me', isAuthenticated, (req, res) => {
       role: req.user.role,
       profilePicture: req.user.profilePicture,
       isEmailVerified: req.user.isEmailVerified,
+      volunteer_status: req.user.volunteer_status,
+      volunteer_tier: req.user.volunteer_tier,
+      isSuperAdmin: req.user.isSuperAdmin,
       stats: req.user.stats
     }
   })

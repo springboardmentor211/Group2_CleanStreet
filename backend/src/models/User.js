@@ -28,6 +28,24 @@ const userSchema = new mongoose.Schema({
     default: 'citizen'
   },
   
+  // Volunteer specific fields
+  volunteer_tier: {
+    type: String,
+    enum: {
+      values: ['basic', 'verified', 'team_lead'],
+      message: '{VALUE} is not a valid volunteer tier'
+    },
+    default: undefined
+  },
+  volunteer_status: {
+    type: String,
+    enum: {
+      values: ['pending', 'active', 'inactive'],
+      message: '{VALUE} is not a valid volunteer status'
+    },
+    default: undefined
+  },
+  
   // Super admin specific fields
   isSuperAdmin: {
     type: Boolean,

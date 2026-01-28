@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material'
 import { CssBaseline } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './contexts/AuthContext'
+import { getSubdomain } from './utils/subdomain'
 
 // Layout
 import MainLayout from './components/Layout/MainLayout'
@@ -24,8 +25,10 @@ import History from './pages/user/History'
 import AdminHome from './pages/admin/Home'
 import AdminDashboard from './pages/admin/Dashboard'
 import AdminUsers from './pages/admin/Users'
+import AdminVolunteers from './pages/admin/Volunteers'
 import AdminReports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/Settings'
+import AdminPendingVolunteers from './pages/admin/PendingVolunteers'
 import AdminLogin from './pages/admin/Login'
 import SetupWizard from './components/setup/SetupWizard'
 import ReportIssue from './pages/ReportIssue'
@@ -35,12 +38,30 @@ import Settings from './pages/user/Settings'
 import Activity from './pages/user/Activity'
 import Analytics from './pages/user/Analytics'
 import Community from './pages/user/Community'
+import VolunteerLogin from './pages/volunteer/Login'
+import VolunteerDashboard from './pages/volunteer/Dashboard'
+import VolunteerProfile from './pages/volunteer/Profile'
+import VolunteerReports from './pages/volunteer/Reports'
+import VolunteerLanding from './pages/volunteer/Landing'
+import VolunteerRegister from './pages/volunteer/Register'
+import VolunteerForgotPassword from './pages/volunteer/ForgotPassword'
+import VolunteerVerifyEmail from './pages/volunteer/VerifyEmail'
+import VolunteerVerificationPending from './pages/volunteer/VerificationPending'
+import VolunteerEvents from './pages/volunteer/Events'
+import MyEvents from './pages/volunteer/MyEvents'
+import CreateEvent from './pages/volunteer/CreateEvent'
 
 // Components
 import ProtectedRoute from './components/Auth/ProtectedRoute'
 
 function App() {
   const [mode, setMode] = useState('light')
+  const [subdomain, setSubdomain] = useState('main')
+
+  useEffect(() => {
+    const current = getSubdomain()
+    setSubdomain(current)
+  }, [])
 
   const theme = useMemo(() => createTheme({
     palette: {
@@ -57,10 +78,6 @@ function App() {
   const toggleColorMode = () => {
     setMode((prev) => (prev === 'light' ? 'dark' : 'light'))
   }
-
-  // Detect if accessing via admin subdomain
-  const isAdminSubdomain = typeof window !== 'undefined' && 
-    window.location.hostname.startsWith('admin.')
   
   return (
     <ThemeProvider theme={theme}>
@@ -69,9 +86,82 @@ function App() {
       <Router>
         <AuthProvider>
           <Routes>
-            {/* Admin Subdomain Routes */}
-            {isAdminSubdomain ? (
+            {/* Volunteer Subdomain Routes (volunteer.cleanstreet.com) */}
+            {subdomain === 'volunteer' ? (
               <>
+                <Route path="/" element={<Navigate to="/login" />} />
+                <Route path="/login" element={<PublicLayout><VolunteerLogin /></PublicLayout>} />
+                <Route path="/register" element={<PublicLayout><VolunteerRegister /></PublicLayout>} />
+                <Route path="/forgot-password" element={<PublicLayout><VolunteerForgotPassword /></PublicLayout>} />
+                <Route path="/verify-email" element={<PublicLayout><VolunteerVerifyEmail /></PublicLayout>} />
+                <Route path="/verification-pending" element={
+                  <ProtectedRoute allowedRoles={["volunteer"]}>
+                    <MainLayout toggleColorMode={toggleColorMode}>
+                      <VolunteerVerificationPending />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/home" element={
+                  <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
+                    <MainLayout toggleColorMode={toggleColorMode}>
+                      <VolunteerDashboard />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/dashboard" element={
+                  <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
+                    <MainLayout toggleColorMode={toggleColorMode}>
+                      <VolunteerDashboard />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/community" element={
+                  <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
+                    <MainLayout toggleColorMode={toggleColorMode}>
+                      <Community />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
+                    <MainLayout toggleColorMode={toggleColorMode}>
+                      <VolunteerProfile />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/events" element={
+                  <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
+                    <MainLayout toggleColorMode={toggleColorMode}>
+                      <VolunteerEvents />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/my-events" element={
+                  <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
+                    <MainLayout toggleColorMode={toggleColorMode}>
+                      <MyEvents />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/create-event" element={
+                  <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
+                    <MainLayout toggleColorMode={toggleColorMode}>
+                      <CreateEvent />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/reports" element={
+                  <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
+                    <MainLayout toggleColorMode={toggleColorMode}>
+                      <VolunteerReports />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="*" element={<Navigate to="/login" />} />
+              </>
+            ) : subdomain === 'admin' ? (
+              <>
+                {/* Admin Subdomain Routes (admin.cleanstreet.com) */}
                 <Route path="/" element={<Navigate to="/home" />} />
                 <Route path="/setup" element={<SetupWizard />} />
                 <Route path="/login" element={<PublicLayout><AdminLogin /></PublicLayout>} />
@@ -107,6 +197,20 @@ function App() {
                   <ProtectedRoute adminOnly>
                     <AdminLayout>
                       <AdminSettings />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/pending-volunteers" element={
+                  <ProtectedRoute adminOnly>
+                    <AdminLayout>
+                      <AdminPendingVolunteers />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/volunteers" element={
+                  <ProtectedRoute adminOnly>
+                    <AdminLayout>
+                      <AdminVolunteers />
                     </AdminLayout>
                   </ProtectedRoute>
                 } />
@@ -224,13 +328,34 @@ function App() {
                     </AdminLayout>
                   </ProtectedRoute>
                 } />
-                  <Route path="/admin/community" element={
-                    <ProtectedRoute adminOnly>
-                      <AdminLayout>
-                        <Community />
-                      </AdminLayout>
-                    </ProtectedRoute>
-                  } />
+                <Route path="/admin/volunteers" element={
+                  <ProtectedRoute adminOnly>
+                    <AdminLayout>
+                      <AdminVolunteers />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/dashboard" element={
+                  <ProtectedRoute adminOnly>
+                    <AdminLayout>
+                      <AdminDashboard />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/reports" element={
+                  <ProtectedRoute adminOnly>
+                    <AdminLayout>
+                      <AdminReports />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/pending-volunteers" element={
+                  <ProtectedRoute adminOnly>
+                    <AdminLayout>
+                      <AdminPendingVolunteers />
+                    </AdminLayout>
+                  </ProtectedRoute>
+                } />
                 <Route path="/admin/settings" element={
                   <ProtectedRoute adminOnly>
                     <AdminLayout>

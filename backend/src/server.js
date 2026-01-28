@@ -113,6 +113,10 @@ const initializeApp = async () => {
     const reportsRoutes = (await import('./routes/reports.js')).default;
     app.use('/api/reports', reportsRoutes);
 
+    // Import and use volunteer routes
+    const volunteerRoutes = (await import('./routes/volunteers.js')).default;
+    app.use('/api/volunteers', volunteerRoutes);
+
     // Import and use setup routes
     const setupRoutes = (await import('./routes/setup.js')).default;
     app.use('/api/setup', setupRoutes);

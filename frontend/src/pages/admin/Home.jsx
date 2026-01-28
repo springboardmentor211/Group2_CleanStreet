@@ -24,7 +24,9 @@ import {
   Home as HomeIcon,
   Dashboard as DashboardIcon,
   Shield,
-  Groups
+  Groups,
+  VolunteerActivism,
+  HourglassEmpty
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -50,6 +52,7 @@ const AdminHome = () => {
     admins: 0,
     superAdmins: 0
   })
+  const [pendingVolunteersCount, setPendingVolunteersCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -58,7 +61,17 @@ const AdminHome = () => {
 
   useEffect(() => {
     fetchStats()
+    fetchPendingVolunteersCount()
   }, [])
+
+  const fetchPendingVolunteersCount = async () => {
+    try {
+      const res = await apiClient.get('/admin/volunteers/pending')
+      setPendingVolunteersCount(res.data.count || 0)
+    } catch (err) {
+      console.log('Could not fetch pending volunteers count')
+    }
+  }
 
   const fetchStats = async () => {
     setLoading(true)
@@ -129,7 +142,7 @@ const AdminHome = () => {
     </Card>
   )
 
-  const QuickActionCard = ({ title, description, icon: Icon, onClick, color }) => (
+  const QuickActionCard = ({ title, description, icon: Icon, onClick, color, badge }) => (
     <Paper
       onClick={onClick}
       sx={{
@@ -138,6 +151,7 @@ const AdminHome = () => {
         cursor: 'pointer',
         border: `1px solid ${theme.palette.divider}`,
         transition: 'all 0.3s ease',
+        position: 'relative',
         '&:hover': {
           transform: isMobile ? 'none' : 'translateY(-4px)',
           boxShadow: isMobile ? theme.shadows[4] : theme.shadows[8],
@@ -145,6 +159,26 @@ const AdminHome = () => {
         }
       }}
     >
+      {badge !== undefined && badge > 0 && (
+        <Box sx={{
+          position: 'absolute',
+          top: -8,
+          right: -8,
+          background: 'linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%)',
+          color: 'white',
+          borderRadius: '50%',
+          width: 32,
+          height: 32,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '0.875rem',
+          fontWeight: 'bold',
+          boxShadow: `0 2px 8px ${alpha('#ff5252', 0.3)}`
+        }}>
+          {badge}
+        </Box>
+      )}
       <Stack spacing={1}>
         <Box sx={{
           width: isMobile ? 36 : 48,
@@ -322,6 +356,16 @@ const AdminHome = () => {
               icon={TrendingUp}
               color={theme.palette.success.main}
               onClick={() => navigate(adminPath('dashboard'))}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <QuickActionCard
+              title="Pending Volunteers"
+              description="Verify & approve volunteers"
+              icon={VolunteerActivism}
+              color={theme.palette.warning.main}
+              badge={pendingVolunteersCount}
+              onClick={() => navigate(adminPath('pending-volunteers'))}
             />
           </Grid>
         </Grid>

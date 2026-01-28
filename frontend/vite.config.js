@@ -19,9 +19,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: 'localhost',
+    host: '0.0.0.0', // Listen on all interfaces to accept subdomains
     port: 3000,
-    strictPort: true,
+    strictPort: false,
+    middlewareMode: false,
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
