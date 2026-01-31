@@ -50,6 +50,7 @@ import VolunteerVerificationPending from './pages/volunteer/VerificationPending'
 import VolunteerEvents from './pages/volunteer/Events'
 import MyEvents from './pages/volunteer/MyEvents'
 import CreateEvent from './pages/volunteer/CreateEvent'
+import CleanStreetMap from './components/maps/CleanStreetMap'
 
 // Components
 import ProtectedRoute from './components/Auth/ProtectedRoute'
@@ -226,6 +227,9 @@ function App() {
                 <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
                 <Route path="/forgot-password" element={<PublicLayout><ForgotPassword /></PublicLayout>} />
                 <Route path="/verify-email" element={<PublicLayout><VerifyEmail /></PublicLayout>} />
+                {/* Volunteer Routes for Localhost */}
+                <Route path="/volunteer/login" element={<PublicLayout><VolunteerLogin /></PublicLayout>} />
+                <Route path="/volunteer/register" element={<PublicLayout><VolunteerRegister /></PublicLayout>} />
                 {/* Report Issue moved under protected route as /report-issue */}
                 <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
                 <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
@@ -272,7 +276,7 @@ function App() {
                 <Route path="/map" element={
                   <ProtectedRoute>
                     <MainLayout toggleColorMode={toggleColorMode}>
-                      <Map />
+                      <CleanStreetMap />
                     </MainLayout>
                   </ProtectedRoute>
                 } />
