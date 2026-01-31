@@ -1,24 +1,24 @@
-1. CleanStreet - Civic Issue Reporting & Tracking App :-
-CleanStreet is a centralized platform designed to empower citizens to report civic issues and track their resolution in real-time.
+1. CleanStreet - Civic Issue Reporting & Tracking App :- </br>
+CleanStreet is a centralized platform designed to empower citizens to report civic issues and track their resolution in real-time.</br>
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-2. Installation & Setup Guide :- To ensure the project runs correctly on your local machine, please follow these steps precisely:-
-#. Clone the Repository
-a. Open this repo:- [https://github.com/springboardmentor211/Group2_CleanStreet]
-b. click on:- code -> open with github desktop(github desktop should be installed to your local machine) -> open with vs code
-c. Install Dependencies (Crucial Step) :- Since the project is divided into a Frontend and a Backend, you must install dependencies for both directories separately.
-   open terminal:- Run these command one by one (1) cd.. (2) cd backend (3) npm install 
-   open another terminal by clicking + icon in your existing terminal:- Run these command one by one (1) cd.. (2) cd frontend (3) npm install
-d. Environment Configuration :- Navigate to the backend directory and create a .env file. Populate it with your database credentials and environment variables as specified                                 in the .env.example file.
-e. Run the Application :- It is recommended to open three separate terminals in VS Code to monitor the logs efficiently:
-    Terminal 1 (Backend Server): Navigate to backend and run this command - npm run dev.
-    Terminal 2 (Frontend Client): Navigate to frontend and run this command - npm run dev.
-  Terminal 3 (Git Operations): Use this terminal for version control and branch management.
-f. click on :- link that link in terminal :-  Local:   http://localhost:3000/
+2. Installation & Setup Guide :- To ensure the project runs correctly on your local machine, please follow these steps precisely:-</br>
+#. Clone the Repository</br>
+a. Open this repo:- [https://github.com/springboardmentor211/Group2_CleanStreet]</br>
+b. click on:- code -> open with github desktop(github desktop should be installed to your local machine) -> open with vs code</br>
+c. Install Dependencies (Crucial Step) :- Since the project is divided into a Frontend and a Backend, you must install dependencies for both directories separately.</br>
+   open terminal:- Run these command one by one (1) cd.. (2) cd backend (3) npm install </br>
+   open another terminal by clicking + icon in your existing terminal:- Run these command one by one (1) cd.. (2) cd frontend (3) npm install</br>
+d. Environment Configuration :- Navigate to the backend directory and create a .env file. Populate it with your database credentials and environment variables as specified                                 in the .env.example file.</br>
+e. Run the Application :- It is recommended to open three separate terminals in VS Code to monitor the logs efficiently:</br>
+    Terminal 1 (Backend Server): Navigate to backend and run this command - npm run dev.</br>
+    Terminal 2 (Frontend Client): Navigate to frontend and run this command - npm run dev.</br>
+  Terminal 3 (Git Operations): Use this terminal for version control and branch management.</br>
+f. click on :- link that link in terminal :-  Local:   http://localhost:3000/</br>
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-3. Contribution Workflow :- To maintain a clean codebase and avoid merge conflicts, please adhere to the following workflow:
-                            Create a dedicated branch for your work: git checkout -b feature-your-name
-                            Commit your changes with descriptive messages.
-                            Push your branch to the remote repository for review.
+3. Contribution Workflow :- To maintain a clean codebase and avoid merge conflicts, please adhere to the following workflow:</br>
+                            Create a dedicated branch for your work: git checkout -b feature-your-name</br>
+                            Commit your changes with descriptive messages.</br>
+                            Push your branch to the remote repository for review.</br>
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 4. How to Use the App :-
 _______________________________________________________________________________________________________________________________________________________________________
@@ -116,11 +116,11 @@ c. Contact & Support
 - Provide feedback on the platform
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-5. Feature added by me -
-   a. Live Impact Map
+5. Feature added by me -</br>
+   a. Live Impact Map</br>
        Lead Developer: Mohammad Jishan
-       I have integrated a Live Impact Map using Leaflet.js and React-Leaflet.
-       Location: Accessible directly on the Landing Page and via the "Explore Issues Map" action button.
-       Functionality: This module provides a real-time visualization of civic reports, allowing users and administrators to identify high-priority areas at a glance.
+       I have integrated a Live Impact Map using Leaflet.js and React-Leaflet.</br>
+       Location: Accessible directly on the Landing Page and via the "Explore Issues Map" action button.</br>
+       Functionality: This module provides a real-time visualization of civic reports, allowing users and administrators to identify high-priority areas at a glance.</br>
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
