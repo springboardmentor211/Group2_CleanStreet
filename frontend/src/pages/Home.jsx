@@ -510,6 +510,8 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera'
 import GpsFixedIcon from '@mui/icons-material/GpsFixed'
 import { keyframes } from '@emotion/react'
 import { styled } from '@mui/material/styles'
+/* FEATURE: MAP-MOHAMMAD-JISHAN */
+import CleanStreetMap from '../components/maps/CleanStreetMap'
 
 // Styled Components
 const FeatureCard = styled(Card)(({ theme, color }) => ({
@@ -730,6 +732,7 @@ const Home = () => {
   }
 
   const handleViewMap = () => {
+    /* FEATURE: MAP-MOHAMMAD-JISHAN */
     navigate('/map')
   }
 
@@ -1060,6 +1063,21 @@ const Home = () => {
           </Grid>
         </Container>
       </Box>
+
+      {/* FEATURE: MAP-MOHAMMAD-JISHAN */}
+      <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10 } }}>
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Typography variant="h3" fontWeight="900" gutterBottom>
+            Live Impact Tracker
+          </Typography>
+          <Typography variant="h6" color="text.secondary">
+            Real-time visualization of reported issues and cleanup drives.
+          </Typography>
+        </Box>
+        <Paper sx={{ p: 2, borderRadius: 4, overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
+          <CleanStreetMap />
+        </Paper>
+      </Container>
 
       {/* Volunteer CTA Section */}
       <Container maxWidth="xl" sx={{ py: { xs: 6, md: 10 } }}>

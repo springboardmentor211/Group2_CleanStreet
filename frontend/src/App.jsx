@@ -20,7 +20,9 @@ import VerifyEmail from './pages/auth/VerifyEmail'
 import Profile from './pages/Profile'
 import Dashboard from './pages/user/Dashboard'
 import Reports from './pages/user/Reports'
+/* FEATURE: MAP-MOHAMMAD-JISHAN */
 import Map from './pages/user/Map'
+import CleanStreetMap from './components/maps/CleanStreetMap'
 import History from './pages/user/History'
 import AdminHome from './pages/admin/Home'
 import AdminDashboard from './pages/admin/Dashboard'
@@ -50,7 +52,6 @@ import VolunteerVerificationPending from './pages/volunteer/VerificationPending'
 import VolunteerEvents from './pages/volunteer/Events'
 import MyEvents from './pages/volunteer/MyEvents'
 import CreateEvent from './pages/volunteer/CreateEvent'
-import CleanStreetMap from './components/maps/CleanStreetMap'
 
 // Components
 import ProtectedRoute from './components/Auth/ProtectedRoute'
@@ -102,6 +103,15 @@ function App() {
                     </MainLayout>
                   </ProtectedRoute>
                 } />
+                /* FEATURE: MAP-MOHAMMAD-JISHAN */
+                <Route path="/map" element={
+                <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
+                <MainLayout toggleColorMode={toggleColorMode}>
+                <CleanStreetMap /> 
+                </MainLayout>
+                </ProtectedRoute>
+                } />
+
                 <Route path="/home" element={
                   <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
                     <MainLayout toggleColorMode={toggleColorMode}>
