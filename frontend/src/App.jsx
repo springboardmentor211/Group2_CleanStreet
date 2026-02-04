@@ -56,12 +56,10 @@ import ProtectedRoute from './components/Auth/ProtectedRoute'
 
 function App() {
   const [mode, setMode] = useState('light')
-  const [subdomain, setSubdomain] = useState('main')
-
-  useEffect(() => {
-    const current = getSubdomain()
-    setSubdomain(current)
-  }, [])
+  const [subdomain, setSubdomain] = useState(() => {
+    // Initialize subdomain immediately from window.location
+    return getSubdomain()
+  })
 
   const theme = useMemo(() => createTheme({
     palette: {

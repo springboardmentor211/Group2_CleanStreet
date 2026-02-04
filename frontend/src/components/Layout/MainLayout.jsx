@@ -1030,7 +1030,7 @@ const MainLayout = ({ children, toggleColorMode }) => {
     },
     { 
       label: 'Profile', 
-      path: user?.role === 'volunteer' ? '/volunteer/profile' : '/profile', 
+      path: '/profile', 
       icon: <Person />, 
       show: true,
       color: 'primary'

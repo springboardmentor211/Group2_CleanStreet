@@ -1102,7 +1102,7 @@ const Home = () => {
                     fontWeight: 600,
                     '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
                   }}
-                  onClick={() => redirectToSubdomain('volunteer', '/register/basic')}
+                  onClick={() => redirectToSubdomain('volunteer', '/Register')}
                 >
                   Sign Up Now
                 </Button>

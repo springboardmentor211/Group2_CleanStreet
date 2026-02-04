@@ -2,6 +2,7 @@ import React from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { CircularProgress, Box } from '@mui/material'
+import { getSubdomain } from '../../utils/subdomain'
 
 const ProtectedRoute = ({ 
   children, 
@@ -10,6 +11,7 @@ const ProtectedRoute = ({
   requireVolunteerVerified = false 
 }) => {
   const { user, loading, isAuthenticated, isAdmin } = useAuth()
+  const subdomain = getSubdomain()
 
   if (loading) {
     return (
@@ -42,7 +44,8 @@ const ProtectedRoute = ({
 
   // Check if volunteer verification is required
   if (requireVolunteerVerified && user?.role === 'volunteer') {
-    if (user?.volunteer_status !== 'active') {
+    // Only enforce verification check on volunteer subdomain
+    if (subdomain === 'volunteer' && user?.volunteer_status !== 'active') {
       return <Navigate to="/verification-pending" replace />
     }
   }

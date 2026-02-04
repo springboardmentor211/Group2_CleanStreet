@@ -75,6 +75,14 @@ const initializeApp = async () => {
     // Global API rate limiter
     app.use('/api/', apiLimiter);
 
+    // Disable caching for API endpoints to prevent 304 responses
+    app.use('/api/', (req, res, next) => {
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+      next();
+    });
+
     // Session configuration
     app.use(session({
       secret: process.env.SESSION_SECRET || 'clean-street-session-secret-2024',

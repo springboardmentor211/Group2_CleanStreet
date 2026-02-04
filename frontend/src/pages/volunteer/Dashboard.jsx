@@ -29,7 +29,9 @@ const Dashboard = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await apiClient.get('/volunteers/profile')
+      const response = await apiClient.get('/volunteers/profile', {
+        headers: { 'Cache-Control': 'no-cache' }
+      })
       if (response.data.success) {
         const profile = response.data.profile
         setStats({
@@ -38,6 +40,8 @@ const Dashboard = () => {
           reportsResolved: 0, // To be implemented
           badges: profile?.badges || []
         })
+      } else {
+        setLoading(false)
       }
     } catch (err) {
       console.error('Failed to fetch stats', err)
@@ -162,7 +166,7 @@ const Dashboard = () => {
           <Button 
             variant="outlined" 
             fullWidth 
-            onClick={() => navigate('/my-events')}
+            onClick={() => navigate('/MyEvents')}
           >
             My Events
           </Button>
@@ -171,7 +175,7 @@ const Dashboard = () => {
           <Button 
             variant="outlined" 
             fullWidth 
-            onClick={() => navigate('/reports')}
+            onClick={() => navigate('/Reports')}
             startIcon={<Assignment />}
           >
             View Reports
