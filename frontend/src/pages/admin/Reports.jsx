@@ -12,7 +12,11 @@ import {
   LinearProgress,
   Alert,
   Stack,
-  Button
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material'
 import { Refresh, Room, Flag } from '@mui/icons-material'
 import axios from 'axios'
@@ -34,6 +38,8 @@ const AdminReports = () => {
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [selectedReport, setSelectedReport] = useState(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   const fetchReports = async () => {
     setLoading(true)
@@ -51,6 +57,11 @@ const AdminReports = () => {
   useEffect(() => {
     fetchReports()
   }, [])
+
+  const handleViewDetails = (report) => {
+    setSelectedReport(report)
+    setDialogOpen(true)
+  }
 
   return (
     <Box sx={{ mt: 2 }}>
@@ -73,6 +84,7 @@ const AdminReports = () => {
               <TableCell>Status</TableCell>
               <TableCell>Priority</TableCell>
               <TableCell>Address</TableCell>
+              <TableCell>Actions</TableCell>
               <TableCell>Created</TableCell>
             </TableRow>
           </TableHead>
@@ -105,13 +117,23 @@ const AdminReports = () => {
                     <Room sx={{ fontSize: 16, color: 'text.secondary' }} />
                     {report.address || '—'}
                   </Typography>
+                  {report.locationDetails && (
+                    <Typography variant="caption" color="text.secondary">
+                      {report.locationDetails}
+                    </Typography>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Button size="small" onClick={() => handleViewDetails(report)}>
+                    Details
+                  </Button>
                 </TableCell>
                 <TableCell>{report.createdAt ? new Date(report.createdAt).toLocaleString() : '—'}</TableCell>
               </TableRow>
             ))}
             {!loading && reports.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell colSpan={7} align="center">
                   <Typography variant="body2" color="text.secondary">No reports found.</Typography>
                 </TableCell>
               </TableRow>
@@ -119,6 +141,52 @@ const AdminReports = () => {
           </TableBody>
         </Table>
       </Paper>
+
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Report Details</DialogTitle>
+        <DialogContent>
+          {selectedReport && (
+            <Stack spacing={2} sx={{ mt: 1 }}>
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">Title</Typography>
+                <Typography variant="body1">{selectedReport.title}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">Description</Typography>
+                <Typography variant="body1">{selectedReport.description}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">Location</Typography>
+                <Typography variant="body1">{selectedReport.address}</Typography>
+                {selectedReport.locationDetails && (
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedReport.locationDetails}
+                  </Typography>
+                )}
+              </Box>
+              {selectedReport.images && selectedReport.images.length > 0 && (
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>Images</Typography>
+                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
+                    {selectedReport.images.map((img, idx) => (
+                      <Box
+                        key={idx}
+                        component="img"
+                        src={img.url}
+                        alt={`Report ${idx + 1}`}
+                        sx={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 1 }}
+                      />
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+            </Stack>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

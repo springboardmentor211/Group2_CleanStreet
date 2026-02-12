@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Container,
   Paper,
@@ -23,18 +23,39 @@ import EmailIcon from '@mui/icons-material/Email'
 import PhoneIcon from '@mui/icons-material/Phone'
 import BadgeIcon from '@mui/icons-material/Badge'
 import SaveIcon from '@mui/icons-material/Save'
+import PhotoCamera from '@mui/icons-material/PhotoCamera'
 
 const Profile = () => {
   const theme = useTheme()
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated, refreshUser } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [imageUploading, setImageUploading] = useState(false)
+  const [profilePicture, setProfilePicture] = useState(user?.profilePicture || '')
+  const fileInputRef = useRef(null)
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
     phone: user?.phone || '',
     role: user?.role || ''
   })
+
+  useEffect(() => {
+    if (user) {
+      setProfilePicture(user.profilePicture || '')
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        role: user.role || ''
+      })
+    }
+  }, [user])
 
   if (!isAuthenticated) {
     navigate('/login')
@@ -43,11 +64,26 @@ const Profile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target
+    if (name === 'phone') {
+      const normalized = value.replace(/[^0-9+]/g, '')
+      setFormData(prev => ({
+        ...prev,
+        phone: normalized
+      }))
+      return
+    }
     setFormData(prev => ({
       ...prev,
       [name]: value
     }))
   }
+
+  const isPhoneValid = (phone) => {
+    if (!phone) return true
+    return /^(\+91)?[6-9][0-9]{9}$/.test(phone)
+  }
+
+  const phoneHasError = !isPhoneValid(formData.phone)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -55,7 +91,7 @@ const Profile = () => {
 
     try {
       const response = await axios.put(
-        'http://localhost:5000/api/auth/profile',
+        '/api/auth/profile',
         {
           name: formData.name,
           phone: formData.phone
@@ -70,11 +106,55 @@ const Profile = () => {
 
       if (response.data.success) {
         toast.success('Profile updated successfully!')
+        if (response.data.user) {
+          setFormData({
+            name: response.data.user.name || '',
+            email: response.data.user.email || '',
+            phone: response.data.user.phone || '',
+            role: response.data.user.role || ''
+          })
+          setProfilePicture(response.data.user.profilePicture || '')
+        }
+        refreshUser()
       }
     } catch (error) {
       toast.error(error.response?.data?.error || 'Failed to update profile')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleProfileImageChange = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload a valid image file')
+      return
+    }
+
+    setImageUploading(true)
+    try {
+      const formDataUpload = new FormData()
+      formDataUpload.append('image', file)
+
+      const response = await axios.post('/api/auth/upload-profile-picture', formDataUpload, {
+        withCredentials: true,
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      if (response.data.success) {
+        setProfilePicture(response.data.image.url)
+        toast.success('Profile picture updated')
+        refreshUser()
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to upload profile picture')
+    } finally {
+      setImageUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
   }
 
@@ -106,6 +186,7 @@ const Profile = () => {
         {/* Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 4 }}>
           <Avatar
+            src={profilePicture || undefined}
             sx={{
               width: 100,
               height: 100,
@@ -116,6 +197,27 @@ const Profile = () => {
           >
             {user?.name?.charAt(0).toUpperCase() || 'U'}
           </Avatar>
+          <Box>
+            <Button
+              variant="outlined"
+              startIcon={<PhotoCamera />}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={imageUploading}
+              sx={{ textTransform: 'none', mb: 1 }}
+            >
+              {imageUploading ? 'Uploading...' : 'Change Photo'}
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleProfileImageChange}
+              style={{ display: 'none' }}
+            />
+            <Typography variant="caption" color="text.secondary" display="block">
+              JPG, PNG, or WebP up to 10MB
+            </Typography>
+          </Box>
           <Box>
             <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
               {user?.name}
@@ -209,8 +311,15 @@ const Profile = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
+                error={phoneHasError}
+                helperText={phoneHasError ? 'Use Indian mobile format (10 digits starting 6-9, optional +91)' : 'Format: +91XXXXXXXXXX or 10 digits'}
                 InputProps={{
                   startAdornment: <PhoneIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                }}
+                inputProps={{
+                  inputMode: 'tel',
+                  pattern: '(\\+91)?[6-9][0-9]{9}',
+                  maxLength: 13
                 }}
                 variant="outlined"
                 sx={{
@@ -250,7 +359,7 @@ const Profile = () => {
             size="large"
             fullWidth
             type="submit"
-            disabled={loading}
+            disabled={loading || phoneHasError}
             startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
             sx={{
               py: 1.5,

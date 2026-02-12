@@ -122,6 +122,11 @@ const VolunteerReports = () => {
                       <Room sx={{ fontSize: 16, color: 'text.secondary' }} />
                       {report.address || '—'}
                     </Typography>
+                    {report.locationDetails && (
+                      <Typography variant="caption" color="text.secondary">
+                        {report.locationDetails}
+                      </Typography>
+                    )}
                     <Typography variant="caption" color="text.secondary">
                       {renderCoordinate(report.latitude)}, {renderCoordinate(report.longitude)}
                     </Typography>
@@ -216,6 +221,11 @@ const VolunteerReports = () => {
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">Location</Typography>
                 <Typography variant="body1">{selectedReport.address}</Typography>
+                {selectedReport.locationDetails && (
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedReport.locationDetails}
+                  </Typography>
+                )}
                 <Typography variant="caption">
                   Coordinates: {renderCoordinate(selectedReport.latitude)}, {renderCoordinate(selectedReport.longitude)}
                 </Typography>

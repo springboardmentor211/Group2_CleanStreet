@@ -135,6 +135,21 @@ const categoryIcons = {
   })
 }
 
+const createSelectionIcon = () => L.divIcon({
+  className: 'location-selection-icon',
+  html: `
+    <div style="display:flex;align-items:center;justify-content:center;width:28px;height:36px;">
+      <svg width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 0C6.8 0 1 5.8 1 13c0 9.7 13 23 13 23s13-13.3 13-23C27 5.8 21.2 0 14 0z" fill="#2563eb" stroke="#ffffff" stroke-width="2" />
+        <circle cx="14" cy="13" r="5" fill="#ffffff" />
+      </svg>
+    </div>
+  `,
+  iconSize: [28, 36],
+  iconAnchor: [14, 36],
+  popupAnchor: [0, -30]
+})
+
 // Category options
 const categories = [
   { value: 'garbage', label: 'Garbage Dump', icon: <CleaningServices />, color: 'error' },
@@ -156,9 +171,22 @@ const priorities = [
 ]
 
 // Location picker component for the map
-const LocationPicker = ({ position, onPositionChange, onAddressChange }) => {
+const LocationPicker = ({ position, onPositionChange, onAddressChange, addressValue }) => {
   const [mapPosition, setMapPosition] = useState(position || [51.505, -0.09])
   const [address, setAddress] = useState('')
+  const mapRef = useRef(null)
+
+  useEffect(() => {
+    if (position) {
+      setMapPosition(position)
+    }
+  }, [position])
+
+  useEffect(() => {
+    if (addressValue) {
+      setAddress(addressValue)
+    }
+  }, [addressValue])
 
   // Automatically get user's current location on mount if no position provided
   useEffect(() => {
@@ -213,10 +241,22 @@ const LocationPicker = ({ position, onPositionChange, onAddressChange }) => {
   const handleGetCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords
           setMapPosition([latitude, longitude])
           onPositionChange([latitude, longitude])
+
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            )
+            const data = await response.json()
+            const addr = data.display_name
+            setAddress(addr)
+            onAddressChange(addr)
+          } catch (error) {
+            console.error('Geocoding error:', error)
+          }
         },
         (error) => {
           toast.error('Unable to get your location: ' + error.message)
@@ -229,9 +269,27 @@ const LocationPicker = ({ position, onPositionChange, onAddressChange }) => {
 
   return (
     <Box sx={{ height: 400, position: 'relative' }}>
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 10,
+          left: 10,
+          zIndex: 1000,
+          bgcolor: 'background.paper',
+          borderRadius: 1,
+          px: 1.5,
+          py: 0.75,
+          boxShadow: 2
+        }}
+      >
+        <Typography variant="caption" color="text.secondary">
+          Click the map or drag the pin to adjust location.
+        </Typography>
+      </Box>
       <MapContainer
         center={mapPosition}
         zoom={13}
+        whenCreated={(map) => { mapRef.current = map }}
         style={{ height: '100%', width: '100%', borderRadius: 8 }}
       >
         <TileLayer
@@ -239,7 +297,30 @@ const LocationPicker = ({ position, onPositionChange, onAddressChange }) => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <MapClickHandler />
-        <Marker position={mapPosition} icon={categoryIcons.default}>
+        <Marker
+          position={mapPosition}
+          icon={createSelectionIcon()}
+          draggable
+          eventHandlers={{
+            dragend: async (e) => {
+              const { lat, lng } = e.target.getLatLng()
+              setMapPosition([lat, lng])
+              onPositionChange([lat, lng])
+
+              try {
+                const response = await fetch(
+                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+                )
+                const data = await response.json()
+                const addr = data.display_name
+                setAddress(addr)
+                onAddressChange(addr)
+              } catch (error) {
+                console.error('Geocoding error:', error)
+              }
+            }
+          }}
+        >
           <Popup>
             Selected Location<br />
             {address || 'Click on map to select location'}
@@ -263,7 +344,7 @@ const LocationPicker = ({ position, onPositionChange, onAddressChange }) => {
             size="small"
             color="primary"
             sx={{ mb: 1, display: 'block' }}
-            onClick={() => {/* Implement zoom in */}}
+            onClick={() => mapRef.current?.zoomIn()}
           >
             <Add />
           </Fab>
@@ -272,7 +353,7 @@ const LocationPicker = ({ position, onPositionChange, onAddressChange }) => {
           <Fab
             size="small"
             color="primary"
-            onClick={() => {/* Implement zoom out */}}
+            onClick={() => mapRef.current?.zoomOut()}
           >
             <Remove />
           </Fab>
@@ -479,6 +560,7 @@ const ReportIssue = () => {
   const [priority, setPriority] = useState('medium')
   const [location, setLocation] = useState(null)
   const [address, setAddress] = useState('')
+  const [locationDetails, setLocationDetails] = useState('')
   const [images, setImages] = useState([])
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [allowComments, setAllowComments] = useState(true)
@@ -520,6 +602,46 @@ const ReportIssue = () => {
       )
     }
   }, [activeStep, location])
+
+  const captureLocationFromDevice = async () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser')
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords
+        const coords = [latitude, longitude]
+        setLocation(coords)
+        toast.success('📍 Location captured from your device')
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          )
+          const data = await response.json()
+          const addr = data.display_name || 'Address not found'
+          setAddress(addr)
+        } catch (err) {
+          console.error('Geocoding error:', err)
+          setAddress('Unable to fetch address')
+        }
+      },
+      (error) => {
+        console.error('Location error:', error)
+        toast.error('Unable to get location. Please enable GPS or select on map.')
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    )
+  }
+
+  const handleImagesChange = (newImages) => {
+    setImages(newImages)
+    if (!location && newImages.length > 0) {
+      captureLocationFromDevice()
+    }
+  }
 
   // Handle category selection
   const handleCategorySelect = (cat) => {
@@ -609,6 +731,7 @@ const ReportIssue = () => {
         latitude: location[0],
         longitude: location[1],
         address,
+        locationDetails,
         isAnonymous,
         allowComments,
         // Include Cloudinary images
@@ -727,13 +850,16 @@ const ReportIssue = () => {
             <Grid container spacing={2} sx={{ mb: 4 }}>
               {categories.map((cat) => (
                 <Grid item xs={6} sm={4} md={3} key={cat.value}>
+                  {(() => {
+                    const mainColor = theme.palette[cat.color]?.main || theme.palette.grey[500]
+                    return (
                   <Card
                     sx={{
                       height: '100%',
                       cursor: 'pointer',
-                      border: category === cat.value ? `3px solid ${theme.palette[cat.color].main}` : '1px solid',
-                      borderColor: category === cat.value ? theme.palette[cat.color].main : 'divider',
-                      bgcolor: category === cat.value ? alpha(theme.palette[cat.color].main, 0.05) : 'background.paper',
+                      border: category === cat.value ? `3px solid ${mainColor}` : '1px solid',
+                      borderColor: category === cat.value ? mainColor : 'divider',
+                      bgcolor: category === cat.value ? alpha(mainColor, 0.05) : 'background.paper',
                       transition: 'all 0.2s ease',
                       '&:hover': {
                         transform: 'translateY(-2px)',
@@ -745,7 +871,7 @@ const ReportIssue = () => {
                     <CardContent sx={{ textAlign: 'center', p: 3 }}>
                       <Box
                         sx={{
-                          color: category === cat.value ? `${cat.color}.main` : 'text.secondary',
+                          color: category === cat.value ? mainColor : 'text.secondary',
                           mb: 1
                         }}
                       >
@@ -756,6 +882,8 @@ const ReportIssue = () => {
                       </Typography>
                     </CardContent>
                   </Card>
+                    )
+                  })()}
                 </Grid>
               ))}
             </Grid>
@@ -862,13 +990,12 @@ const ReportIssue = () => {
               </Alert>
             )}
 
-            {location && (
-              <LocationPicker
-                position={location}
-                onPositionChange={setLocation}
-                onAddressChange={setAddress}
-              />
-            )}
+            <LocationPicker
+              position={location}
+              onPositionChange={setLocation}
+              onAddressChange={setAddress}
+              addressValue={address}
+            />
 
             {address && (
               <Alert 
@@ -889,6 +1016,8 @@ const ReportIssue = () => {
                 placeholder="e.g., Near the red building, next to the park entrance, etc."
                 multiline
                 rows={2}
+                value={locationDetails}
+                onChange={(e) => setLocationDetails(e.target.value)}
                 helperText="Add any helpful location details that aren't visible on the map"
               />
             </Box>
@@ -913,8 +1042,13 @@ const ReportIssue = () => {
 
             <CloudinaryImageUpload
               images={images}
-              onImagesChange={setImages}
-              maxImages={5}
+              onImagesChange={handleImagesChange}
+              maxImages={8}
+              onCaptureStart={() => {
+                if (!location) {
+                  captureLocationFromDevice()
+                }
+              }}
             />
 
             <Alert severity="info" sx={{ mt: 3 }}>
@@ -1020,6 +1154,11 @@ const ReportIssue = () => {
                       <Typography variant="body1" fontWeight="medium" gutterBottom>
                         {address || 'Not selected'}
                       </Typography>
+                      {locationDetails && (
+                        <Typography variant="body2" color="text.secondary">
+                          {locationDetails}
+                        </Typography>
+                      )}
                       {location && (
                         <Typography variant="caption" color="text.secondary">
                           Coordinates: {location[0].toFixed(6)}, {location[1].toFixed(6)}
@@ -1040,7 +1179,7 @@ const ReportIssue = () => {
                         <Box
                           key={index}
                           component="img"
-                          src={image.preview}
+                          src={image.preview || image.thumbnail || image.url}
                           alt={`Preview ${index + 1}`}
                           sx={{
                             width: 80,

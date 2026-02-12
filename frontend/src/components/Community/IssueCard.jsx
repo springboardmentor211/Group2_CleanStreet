@@ -117,6 +117,18 @@ const IssueCard = ({ issue, onOpenDetails, onRefresh, currentUserId }) => {
     setAnchorEl(null)
   }
 
+  const getMapUrl = () => {
+    if (issue.latitude && issue.longitude) {
+      return `https://www.google.com/maps/search/?api=1&query=${issue.latitude},${issue.longitude}`
+    }
+    if (issue.address) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(issue.address)}`
+    }
+    return null
+  }
+
+  const mapUrl = getMapUrl()
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'resolved':
@@ -199,34 +211,51 @@ const IssueCard = ({ issue, onOpenDetails, onRefresh, currentUserId }) => {
         </Box>
 
         {/* Full Width Image */}
-        {issue.images && issue.images.length > 0 ? (
-          <CardMedia
-            component="img"
-            image={issue.images[0].url}
-            alt={issue.title}
-            sx={{
-              width: '100%',
-              height: 'auto',
-              aspectRatio: '4 / 3',
-              objectFit: 'cover',
+        <Box sx={{ position: 'relative' }}>
+          {issue.images && issue.images.length > 0 ? (
+            <CardMedia
+              component="img"
+              image={issue.images[0].url}
+              alt={issue.title}
+              sx={{
+                width: '100%',
+                height: 220,
+                objectFit: 'cover',
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: '100%',
+                height: 220,
+                backgroundColor: getCategoryColor(issue.category),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography variant="h4" color="white" sx={{ fontWeight: 'bold' }}>
+                {issue.category.toUpperCase()}
+              </Typography>
+            </Box>
+          )}
+          <Button
+            size="small"
+            variant="contained"
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpenDetails()
             }}
-          />
-        ) : (
-          <Box
             sx={{
-              width: '100%',
-              aspectRatio: '4 / 3',
-              backgroundColor: getCategoryColor(issue.category),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              textTransform: 'none',
             }}
           >
-            <Typography variant="h4" color="white" sx={{ fontWeight: 'bold' }}>
-              {issue.category.toUpperCase()}
-            </Typography>
-          </Box>
-        )}
+            More
+          </Button>
+        </Box>
 
         {/* Actions */}
         <CardActions sx={{ px: 2, py: 1.5, justifyContent: 'space-between' }}>
@@ -387,6 +416,14 @@ const IssueCard = ({ issue, onOpenDetails, onRefresh, currentUserId }) => {
         onClose={handleMenuClose}
         onClick={(e) => e.stopPropagation()}
       >
+        {mapUrl && (
+          <MenuItem onClick={() => {
+            window.open(mapUrl, '_blank', 'noopener,noreferrer')
+            handleMenuClose()
+          }}>
+            Open Location
+          </MenuItem>
+        )}
         <MenuItem onClick={() => {
           onOpenDetails()
           handleMenuClose()

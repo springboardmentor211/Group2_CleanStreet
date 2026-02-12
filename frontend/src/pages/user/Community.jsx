@@ -49,6 +49,17 @@ const Community = () => {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false)
   const [commentsLoading, setCommentsLoading] = useState(false)
 
+  const getMapUrl = (issue) => {
+    if (!issue) return null
+    if (issue.latitude && issue.longitude) {
+      return `https://www.google.com/maps/search/?api=1&query=${issue.latitude},${issue.longitude}`
+    }
+    if (issue.address) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(issue.address)}`
+    }
+    return null
+  }
+
   // Fetch issues
   const fetchIssues = useCallback(async () => {
     try {
@@ -270,6 +281,16 @@ const Community = () => {
                 <Stack direction="row" spacing={1} alignItems="center">
                   <LocationOn sx={{ width: 20, height: 20, color: 'primary.main' }} />
                   <Typography variant="body2">{selectedIssue.address}</Typography>
+                  {getMapUrl(selectedIssue) && (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => window.open(getMapUrl(selectedIssue), '_blank', 'noopener,noreferrer')}
+                      sx={{ ml: 1, textTransform: 'none' }}
+                    >
+                      Open Location
+                    </Button>
+                  )}
                 </Stack>
 
                 {/* Images */}

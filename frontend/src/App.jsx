@@ -40,6 +40,7 @@ import Analytics from './pages/user/Analytics'
 import Community from './pages/user/Community'
 import VolunteerLogin from './pages/volunteer/Login'
 import VolunteerDashboard from './pages/volunteer/Dashboard'
+import VolunteerHome from './pages/volunteer/Home'
 import VolunteerProfile from './pages/volunteer/Profile'
 import VolunteerReports from './pages/volunteer/Reports'
 import VolunteerLanding from './pages/volunteer/Landing'
@@ -102,7 +103,7 @@ function App() {
                 <Route path="/home" element={
                   <ProtectedRoute allowedRoles={["volunteer", "admin", "super-admin"]} requireVolunteerVerified={true}>
                     <MainLayout toggleColorMode={toggleColorMode}>
-                      <VolunteerDashboard />
+                      <VolunteerHome />
                     </MainLayout>
                   </ProtectedRoute>
                 } />
@@ -257,6 +258,13 @@ function App() {
                   <ProtectedRoute>
                     <MainLayout toggleColorMode={toggleColorMode}>
                       <Dashboard />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/home" element={
+                  <ProtectedRoute allowedRoles={["volunteer"]}>
+                    <MainLayout toggleColorMode={toggleColorMode}>
+                      <VolunteerHome />
                     </MainLayout>
                   </ProtectedRoute>
                 } />

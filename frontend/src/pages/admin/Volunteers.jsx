@@ -264,7 +264,10 @@ const AdminVolunteers = () => {
                   </TableCell>
                   <TableCell>
                     <Stack direction="row" alignItems="center" spacing={1}>
-                      <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>
+                      <Avatar
+                        src={volunteer.profilePicture || undefined}
+                        sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}
+                      >
                         {(volunteer.name || volunteer.email || '?').charAt(0).toUpperCase()}
                       </Avatar>
                       <Typography variant="body2" fontWeight="500">{volunteer.name || 'Unknown'}</Typography>
@@ -367,7 +370,10 @@ const AdminVolunteers = () => {
               {/* Basic Info */}
               <Paper sx={{ p: 2, mb: 2 }}>
                 <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                  <Avatar sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}>
+                  <Avatar
+                    src={selectedVolunteer.profilePicture || undefined}
+                    sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}
+                  >
                     {selectedVolunteer.name?.charAt(0).toUpperCase()}
                   </Avatar>
                   <Box>

@@ -129,6 +129,10 @@ const initializeApp = async () => {
     const setupRoutes = (await import('./routes/setup.js')).default;
     app.use('/api/setup', setupRoutes);
 
+    // Import and use notification routes
+    const notificationRoutes = (await import('./routes/notifications.js')).default;
+    app.use('/api/notifications', notificationRoutes);
+
     // Admin setup endpoint (only available in development or with special key)
     app.post('/api/setup/super-admin', async (req, res) => {
       // Only allow in development mode or with master key

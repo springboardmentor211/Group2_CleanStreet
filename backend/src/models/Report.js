@@ -41,6 +41,10 @@ const reportSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  locationDetails: {
+    type: String,
+    trim: true
+  },
   latitude: Number,
   longitude: Number,
   images: [{

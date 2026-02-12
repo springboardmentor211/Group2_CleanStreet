@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import {
   AppBar,
@@ -18,6 +18,7 @@ import {
   ListItemButton,
   Divider,
   Chip,
+  Badge,
   useMediaQuery,
   useTheme
 } from '@mui/material'
@@ -48,6 +49,9 @@ const AdminLayout = ({ children }) => {
   
   const [mobileOpen, setMobileOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null)
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState(null)
+  const [notifications, setNotifications] = useState([])
+  const [unreadCount, setUnreadCount] = useState(0)
 
   // Debug logging
   React.useEffect(() => {
@@ -71,6 +75,14 @@ const AdminLayout = ({ children }) => {
     setAnchorEl(null)
   }
 
+  const handleNotificationClick = (event) => {
+    setNotificationAnchorEl(event.currentTarget)
+  }
+
+  const handleNotificationClose = () => {
+    setNotificationAnchorEl(null)
+  }
+
   const handleLogout = async () => {
     await logout()
     handleClose()
@@ -78,6 +90,59 @@ const AdminLayout = ({ children }) => {
 
   const isAdminSubdomain = typeof window !== 'undefined' && 
     window.location.hostname.startsWith('admin.')
+
+  const resolveAdminLink = (link) => {
+    if (!link) return ''
+    if (isAdminSubdomain) return link
+    if (link.startsWith('/admin')) return link
+    return `/admin${link}`
+  }
+
+  const fetchNotifications = useCallback(async () => {
+    if (!user) return
+    try {
+      const response = await fetch('/api/notifications?limit=20', {
+        credentials: 'include'
+      })
+      const data = await response.json()
+      if (data.success) {
+        const normalized = (data.notifications || []).map((item) => ({
+          id: item._id,
+          title: item.title,
+          message: item.message,
+          link: item.link,
+          type: item.type,
+          unread: !item.isRead,
+          timestamp: item.createdAt
+        }))
+        setNotifications(normalized)
+        setUnreadCount(data.unreadCount || 0)
+      }
+    } catch (error) {
+      console.error('Notifications fetch error:', error)
+    }
+  }, [user])
+
+  useEffect(() => {
+    fetchNotifications()
+    const intervalId = setInterval(fetchNotifications, 45000)
+    return () => clearInterval(intervalId)
+  }, [fetchNotifications])
+
+  const markAsRead = async (id) => {
+    try {
+      await fetch(`/api/notifications/${id}/read`, {
+        method: 'PUT',
+        credentials: 'include'
+      })
+      setNotifications((prev) => prev.map((item) => (
+        item.id === id ? { ...item, unread: false } : item
+      )))
+      setUnreadCount((prev) => Math.max(prev - 1, 0))
+    } catch (error) {
+      console.error('Notification update error:', error)
+    }
+  }
 
   const menuItems = [
     { 
@@ -207,8 +272,10 @@ const AdminLayout = ({ children }) => {
             {menuItems.find(item => item.path === location.pathname)?.text || 'Admin Dashboard'}
           </Typography>
 
-          <IconButton color="inherit" sx={{ mr: 1 }}>
-            <NotificationsIcon />
+          <IconButton color="inherit" sx={{ mr: 1 }} onClick={handleNotificationClick}>
+            <Badge badgeContent={unreadCount} color="error">
+              <NotificationsIcon />
+            </Badge>
           </IconButton>
 
           {user && (
@@ -225,7 +292,10 @@ const AdminLayout = ({ children }) => {
                 />
               </Box>
               <IconButton onClick={handleMenu} sx={{ p: 0 }}>
-                <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
+                <Avatar
+                  src={user.profilePicture || undefined}
+                  sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}
+                >
                   {user.name.charAt(0).toUpperCase()}
                 </Avatar>
               </IconButton>
@@ -254,6 +324,63 @@ const AdminLayout = ({ children }) => {
           )}
         </Toolbar>
       </AppBar>
+
+      <Menu
+        anchorEl={notificationAnchorEl}
+        open={Boolean(notificationAnchorEl)}
+        onClose={handleNotificationClose}
+        PaperProps={{
+          sx: {
+            width: 360,
+            maxHeight: 500,
+            borderRadius: 2,
+            mt: 1
+          }
+        }}
+      >
+        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+          <Typography variant="subtitle1" fontWeight="bold">
+            Notifications ({unreadCount})
+          </Typography>
+        </Box>
+        <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
+          {notifications.length > 0 ? (
+            notifications.map((notification) => (
+              <MenuItem
+                key={notification.id}
+                onClick={() => {
+                  markAsRead(notification.id)
+                  if (notification.link) {
+                    navigate(resolveAdminLink(notification.link))
+                  }
+                  handleNotificationClose()
+                }}
+                sx={{
+                  alignItems: 'flex-start',
+                  py: 1.5,
+                  borderLeft: notification.unread ? '3px solid' : 'none',
+                  borderColor: notification.unread ? 'primary.main' : 'transparent'
+                }}
+              >
+                <Box>
+                  <Typography variant="body2" fontWeight={notification.unread ? 700 : 500}>
+                    {notification.title}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {notification.message}
+                  </Typography>
+                </Box>
+              </MenuItem>
+            ))
+          ) : (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                No notifications yet
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Menu>
 
       {/* Drawer */}
       <Box component="nav" sx={{ width: 0, flexShrink: 0 }}>

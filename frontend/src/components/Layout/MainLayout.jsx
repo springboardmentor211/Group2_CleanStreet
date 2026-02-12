@@ -826,9 +826,8 @@ const NavButton = styled(Button)(({ theme, selected }) => ({
 
 const MainLayout = ({ children, toggleColorMode }) => {
   const { user, logout, isAdmin, isSuperAdmin } = useAuth()
-  const notifications = []
-  const unreadCount = 0
-  const markAsRead = () => {}
+  const [notifications, setNotifications] = useState([])
+  const [unreadCount, setUnreadCount] = useState(0)
   const navigate = useNavigate()
   const location = useLocation()
   const theme = useTheme()
@@ -841,6 +840,52 @@ const MainLayout = ({ children, toggleColorMode }) => {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' })
   const [drawerHovered, setDrawerHovered] = useState(false)
   const [expandedSection, setExpandedSection] = useState(null)
+
+  const fetchNotifications = useCallback(async () => {
+    if (!user) return
+    try {
+      const response = await fetch('/api/notifications?limit=20', {
+        credentials: 'include'
+      })
+      const data = await response.json()
+      if (data.success) {
+        const normalized = (data.notifications || []).map((item) => ({
+          id: item._id,
+          title: item.title,
+          message: item.message,
+          link: item.link,
+          type: item.type,
+          unread: !item.isRead,
+          timestamp: item.createdAt
+        }))
+        setNotifications(normalized)
+        setUnreadCount(data.unreadCount || 0)
+      }
+    } catch (error) {
+      console.error('Notifications fetch error:', error)
+    }
+  }, [user])
+
+  useEffect(() => {
+    fetchNotifications()
+    const intervalId = setInterval(fetchNotifications, 45000)
+    return () => clearInterval(intervalId)
+  }, [fetchNotifications])
+
+  const markAsRead = async (id) => {
+    try {
+      await fetch(`/api/notifications/${id}/read`, {
+        method: 'PUT',
+        credentials: 'include'
+      })
+      setNotifications((prev) => prev.map((item) => (
+        item.id === id ? { ...item, unread: false } : item
+      )))
+      setUnreadCount((prev) => Math.max(prev - 1, 0))
+    } catch (error) {
+      console.error('Notification update error:', error)
+    }
+  }
 
   // Get breadcrumbs from current path
   const getBreadcrumbs = useCallback(() => {
@@ -1078,6 +1123,7 @@ const MainLayout = ({ children, toggleColorMode }) => {
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Avatar 
+            src={user?.profilePicture || undefined}
             sx={{ 
               width: 64, 
               height: 64, 
@@ -1421,9 +1467,10 @@ const MainLayout = ({ children, toggleColorMode }) => {
                     color="inherit"
                     onClick={handleNotificationClick}
                     sx={{
-                      background: alpha(theme.palette.primary.main, 0.1),
+                      color: theme.palette.primary.main,
+                      background: alpha(theme.palette.primary.main, 0.18),
                       '&:hover': {
-                        background: alpha(theme.palette.primary.main, 0.2),
+                        background: alpha(theme.palette.primary.main, 0.3),
                         transform: 'scale(1.1)',
                       },
                       transition: 'all 0.3s ease',
@@ -1466,6 +1513,7 @@ const MainLayout = ({ children, toggleColorMode }) => {
                     }}
                   >
                     <Avatar 
+                      src={user?.profilePicture || undefined}
                       sx={{ 
                         width: 40, 
                         height: 40,
@@ -1521,7 +1569,10 @@ const MainLayout = ({ children, toggleColorMode }) => {
                         px: 2,
                       }}
                     >
-                      <Avatar sx={{ width: 36, height: 36 }}>
+                      <Avatar
+                        src={user?.profilePicture || undefined}
+                        sx={{ width: 36, height: 36 }}
+                      >
                         {user.name?.charAt(0).toUpperCase()}
                       </Avatar>
                       <Box>

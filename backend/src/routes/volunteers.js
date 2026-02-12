@@ -2,6 +2,7 @@ import express from 'express'
 import User from '../models/User.js'
 import VolunteerProfile from '../models/VolunteerProfile.js'
 import VolunteerApplication from '../models/VolunteerApplication.js'
+import Notification from '../models/Notification.js'
 import Event from '../models/Event.js'
 import { body, validationResult } from 'express-validator'
 import passport from '../config/passport.js'
@@ -86,6 +87,26 @@ router.post('/register-basic', [
     })
 
     await volunteerProfile.save()
+
+    try {
+      const admins = await User.find({
+        role: { $in: ['admin', 'super-admin'] },
+        isActive: true
+      }).select('_id').lean()
+
+      if (admins.length > 0) {
+        const notifications = admins.map(admin => ({
+          userId: admin._id,
+          title: 'Volunteer verification pending',
+          message: `${user.name} registered as a volunteer`,
+          link: '/pending-volunteers',
+          type: 'admin'
+        }))
+        await Notification.insertMany(notifications)
+      }
+    } catch (notifyError) {
+      console.error('Notification error:', notifyError)
+    }
 
     // Generate and send OTP
     const otp = emailService.generateOTP(6)

@@ -171,6 +171,11 @@ const Reports = () => {
                       <Typography variant="body2" color="text.secondary">
                         {report.address}
                       </Typography>
+                      {report.locationDetails && (
+                        <Typography variant="caption" color="text.secondary">
+                          {report.locationDetails}
+                        </Typography>
+                      )}
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                       <Chip
@@ -290,6 +295,11 @@ const Reports = () => {
                 <Typography variant="caption" color="text.secondary">
                   {reportToDelete.address}
                 </Typography>
+                {reportToDelete.locationDetails && (
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                    {reportToDelete.locationDetails}
+                  </Typography>
+                )}
               </Box>
             )}
           </DialogContentText>

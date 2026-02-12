@@ -1,5 +1,7 @@
 import express from 'express'
 import Report from '../models/Report.js'
+import Notification from '../models/Notification.js'
+import User from '../models/User.js'
 import { body, validationResult } from 'express-validator'
 import { upload } from '../config/multer.js'
 import { uploadImage, deleteImage } from '../config/cloudinary.js'
@@ -57,6 +59,7 @@ router.post('/create', isAuthenticated, [
   body('title').trim().notEmpty().isLength({ min: 5 }),
   body('description').trim().notEmpty().isLength({ min: 10 }),
   body('address').trim().notEmpty(),
+  body('locationDetails').optional().isString().isLength({ max: 500 }),
   body('latitude').isFloat(),
   body('longitude').isFloat(),
   body('priority').optional().isIn(['low', 'medium', 'high', 'critical']),
@@ -79,6 +82,7 @@ router.post('/create', isAuthenticated, [
       latitude,
       longitude,
       address,
+      locationDetails,
       isAnonymous = false,
       allowComments = true,
       images = []
@@ -107,12 +111,34 @@ router.post('/create', isAuthenticated, [
       latitude,
       longitude,
       address,
+      locationDetails,
       isAnonymous,
       allowComments,
       images: processedImages
     })
 
     await report.save()
+
+    try {
+      const recipients = await User.find({
+        role: { $in: ['citizen', 'volunteer'] },
+        isActive: true,
+        _id: { $ne: req.user._id }
+      }).select('_id').lean()
+
+      if (recipients.length > 0) {
+        const notifications = recipients.map(userItem => ({
+          userId: userItem._id,
+          title: 'New issue reported',
+          message: report.title,
+          link: '/community',
+          type: 'issue'
+        }))
+        await Notification.insertMany(notifications)
+      }
+    } catch (notifyError) {
+      console.error('Notification error:', notifyError)
+    }
 
     res.status(201).json({
       success: true,
@@ -213,6 +239,20 @@ router.put('/:id/status', isAuthenticated, [
         success: false,
         error: 'Report not found'
       })
+    }
+
+    try {
+      if (report.userId) {
+        await Notification.create({
+          userId: report.userId,
+          title: 'Issue status updated',
+          message: `${report.title} is now ${status}`,
+          link: '/my-reports',
+          type: 'status'
+        })
+      }
+    } catch (notifyError) {
+      console.error('Notification error:', notifyError)
     }
 
     res.json({
@@ -385,6 +425,20 @@ router.post('/:id/comment', isAuthenticated, [
 
     report.comments.push(comment)
     await report.save()
+
+    try {
+      if (report.userId && report.userId.toString() !== req.user._id.toString()) {
+        await Notification.create({
+          userId: report.userId,
+          title: 'New comment on your issue',
+          message: report.title,
+          link: `/community/post/${report._id}`,
+          type: 'comment'
+        })
+      }
+    } catch (notifyError) {
+      console.error('Notification error:', notifyError)
+    }
 
     res.status(201).json({
       success: true,

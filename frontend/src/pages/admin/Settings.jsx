@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
   Box,
   Paper,
@@ -10,12 +10,17 @@ import {
   FormControlLabel,
   Divider,
   Alert,
-  Stack
+  Stack,
+  Avatar
 } from '@mui/material'
 import { useAuth } from '../../contexts/AuthContext'
+import PhotoCamera from '@mui/icons-material/PhotoCamera'
+import toast from 'react-hot-toast'
 
 const AdminSettings = () => {
-  const { user } = useAuth()
+  const { user, refreshUser } = useAuth()
+  const [imageUploading, setImageUploading] = useState(false)
+  const fileInputRef = useRef(null)
 
   const [preferences, setPreferences] = useState({
     emailNotifications: true,
@@ -45,6 +50,44 @@ const AdminSettings = () => {
     setMessage('Password change request prepared (hook API when available).')
   }
 
+  const handleProfileImageChange = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload a valid image file')
+      return
+    }
+
+    setImageUploading(true)
+    try {
+      const formDataUpload = new FormData()
+      formDataUpload.append('image', file)
+
+      const response = await fetch('/api/auth/upload-profile-picture', {
+        method: 'POST',
+        body: formDataUpload,
+        credentials: 'include'
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Profile picture updated')
+        refreshUser()
+      } else {
+        throw new Error(data.error || 'Failed to upload profile picture')
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to upload profile picture')
+    } finally {
+      setImageUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
   return (
     <Box sx={{ mt: 2 }}>
       <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -61,6 +104,34 @@ const AdminSettings = () => {
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>Profile</Typography>
           <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Avatar
+                  src={user?.profilePicture || undefined}
+                  sx={{ width: 64, height: 64, bgcolor: 'primary.main' }}
+                >
+                  {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                </Avatar>
+                <Box>
+                  <Button
+                    variant="outlined"
+                    startIcon={<PhotoCamera />}
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={imageUploading}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    {imageUploading ? 'Uploading...' : 'Change Photo'}
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfileImageChange}
+                    style={{ display: 'none' }}
+                  />
+                </Box>
+              </Stack>
+            </Grid>
             <Grid item xs={12} md={6}>
               <TextField
                 label="Name"

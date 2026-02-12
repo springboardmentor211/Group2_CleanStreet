@@ -222,6 +222,7 @@ const ProfileMenu = memo(({ user, onLogout }) => {
         }}
       >
         <Avatar
+          src={user?.profilePicture || undefined}
           sx={{
             width: 32,
             height: 32,

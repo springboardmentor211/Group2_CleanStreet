@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import { Container, Paper, Typography, Box, Grid, Chip, CircularProgress, Stack, Divider, LinearProgress } from '@mui/material'
+import React, { useEffect, useRef, useState } from 'react'
+import { Container, Paper, Typography, Box, Grid, Chip, CircularProgress, Stack, Divider, LinearProgress, Button, Avatar } from '@mui/material'
 import { VolunteerActivism, EmojiEvents, AccessTime, Event, Star } from '@mui/icons-material'
 import { useAuth } from '../../contexts/AuthContext'
 import axios from 'axios'
+import toast from 'react-hot-toast'
+import PhotoCamera from '@mui/icons-material/PhotoCamera'
 
 const apiClient = axios.create({
   baseURL: '/api',
@@ -11,9 +13,12 @@ const apiClient = axios.create({
 })
 
 const Profile = () => {
-  const { user } = useAuth()
+  const { user, refreshUser } = useAuth()
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
+  const [imageUploading, setImageUploading] = useState(false)
+  const [profilePicture, setProfilePicture] = useState(user?.profilePicture || '')
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     fetchProfile()
@@ -32,12 +37,49 @@ const Profile = () => {
     }
   }
 
+  useEffect(() => {
+    setProfilePicture(user?.profilePicture || '')
+  }, [user])
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
         <CircularProgress />
       </Box>
     )
+  }
+
+  const handleProfileImageChange = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload a valid image file')
+      return
+    }
+
+    setImageUploading(true)
+    try {
+      const formDataUpload = new FormData()
+      formDataUpload.append('image', file)
+
+      const response = await apiClient.post('/auth/upload-profile-picture', formDataUpload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      if (response.data.success) {
+        setProfilePicture(response.data.image.url)
+        toast.success('Profile picture updated')
+        refreshUser()
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to upload profile picture')
+    } finally {
+      setImageUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
   }
 
   const getTierInfo = () => {
@@ -56,7 +98,28 @@ const Profile = () => {
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Paper elevation={0} sx={{ p: 4, borderRadius: 3, border: '1px solid #e0e0e0' }}>
         <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <VolunteerActivism sx={{ fontSize: 80, color: tierInfo.color + '.main', mb: 2 }} />
+          <Avatar
+            src={profilePicture || undefined}
+            sx={{ width: 96, height: 96, mx: 'auto', mb: 2, bgcolor: 'primary.main' }}
+          >
+            {user?.name?.charAt(0)?.toUpperCase() || 'V'}
+          </Avatar>
+          <Button
+            variant="outlined"
+            startIcon={<PhotoCamera />}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={imageUploading}
+            sx={{ textTransform: 'none', mb: 2 }}
+          >
+            {imageUploading ? 'Uploading...' : 'Change Photo'}
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleProfileImageChange}
+            style={{ display: 'none' }}
+          />
           <Typography variant="h4" fontWeight="bold" gutterBottom>
             {user?.name}
           </Typography>

@@ -249,7 +249,10 @@ const AdminUsers = () => {
                   </TableCell>
                   <TableCell>
                     <Stack direction="row" alignItems="center" spacing={1}>
-                      <Avatar sx={{ bgcolor: user.isSuperAdmin ? 'warning.main' : 'primary.main', width: 32, height: 32 }}>
+                      <Avatar
+                        src={user.profilePicture || undefined}
+                        sx={{ bgcolor: user.isSuperAdmin ? 'warning.main' : 'primary.main', width: 32, height: 32 }}
+                      >
                         {(user.name || user.email || '?').charAt(0).toUpperCase()}
                       </Avatar>
                       <Box>
@@ -339,7 +342,10 @@ const AdminUsers = () => {
               {/* Basic Info */}
               <Paper sx={{ p: 2, mb: 2 }}>
                 <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                  <Avatar sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}>
+                  <Avatar
+                    src={selectedUser.profilePicture || undefined}
+                    sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}
+                  >
                     {selectedUser.name?.charAt(0).toUpperCase()}
                   </Avatar>
                   <Box>

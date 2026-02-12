@@ -48,6 +48,37 @@ export const uploadImage = async (fileBuffer, fileName) => {
   }
 }
 
+export const uploadProfileImage = async (fileBuffer, fileName) => {
+  try {
+    uploadConfig()
+
+    return new Promise((resolve, reject) => {
+      if (!cloudinary.v2.config().cloud_name) {
+        return reject(new Error('Cloudinary is not configured'))
+      }
+      const uploadStream = cloudinary.v2.uploader.upload_stream(
+        {
+          resource_type: 'auto',
+          public_id: fileName,
+          folder: 'clean_street/profiles',
+          overwrite: true,
+          quality: 'auto:best',
+          fetch_format: 'auto'
+        },
+        (error, result) => {
+          if (error) reject(error)
+          else resolve(result)
+        }
+      )
+
+      uploadStream.end(fileBuffer)
+    })
+  } catch (error) {
+    console.error('Cloudinary upload error:', error)
+    throw error
+  }
+}
+
 export const deleteImage = async (publicId) => {
   try {
     uploadConfig()

@@ -36,10 +36,44 @@ const categoryColors = {
 
 const createDivIcon = (color) => L.divIcon({
   className: 'custom-div-icon',
-  html: `<div style="width:18px;height:18px;border-radius:50%;background:${color};border:2px solid ${alpha(color, 0.3)}"></div>`,
-  iconSize: [18, 18],
-  iconAnchor: [9, 9]
+  html: `
+    <div style="display:flex;align-items:center;justify-content:center;width:26px;height:32px;">
+      <svg width="26" height="32" viewBox="0 0 26 32" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13 0C6.4 0 1 5.4 1 12c0 9.1 12 20 12 20s12-10.9 12-20C25 5.4 19.6 0 13 0z" fill="${color}" stroke="#ffffff" stroke-width="2" />
+        <circle cx="13" cy="12" r="4" fill="#ffffff" />
+      </svg>
+    </div>
+  `,
+  iconSize: [26, 32],
+  iconAnchor: [13, 32],
+  popupAnchor: [0, -28]
 })
+
+const createUserIcon = () => L.divIcon({
+  className: 'custom-user-icon',
+  html: `
+    <div style="width:20px;height:20px;border-radius:50%;background:#111827;border:2px solid #ffffff;box-shadow:0 0 0 6px rgba(17,24,39,0.2),0 8px 12px rgba(0,0,0,0.25);"></div>
+  `,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
+  popupAnchor: [0, -12]
+})
+
+const nearbyRadiusKm = 2
+
+const toRadians = (deg) => (deg * Math.PI) / 180
+
+const distanceKm = (from, to) => {
+  const earthRadiusKm = 6371
+  const dLat = toRadians(to.lat - from.lat)
+  const dLng = toRadians(to.lng - from.lng)
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(from.lat)) * Math.cos(toRadians(to.lat)) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return earthRadiusKm * c
+}
 
 function DrawControl({ onShapeCreated }) {
   const map = useMap()
@@ -161,8 +195,11 @@ const Map = () => {
       const shapeGeoJSON = shapeFilter.toGeoJSON()
       filtered = filtered.filter(i => booleanPointInPolygon([i.lng, i.lat], shapeGeoJSON))
     }
+    if (userLocation) {
+      filtered = filtered.filter(i => distanceKm(userLocation, { lat: i.lat, lng: i.lng }) <= nearbyRadiusKm)
+    }
     setFilteredIssues(filtered)
-  }, [issues, selectedCategories, shapeFilter])
+  }, [issues, selectedCategories, shapeFilter, userLocation])
 
   const allCategories = useMemo(() => {
     const set = new Set(issues.map(i => i.category).filter(Boolean))
@@ -187,6 +224,11 @@ const Map = () => {
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
           Explore reported issues, filter by category, draw areas, plan routes, and print views.
         </Typography>
+        {userLocation && (
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Showing issues within {nearbyRadiusKm} km of your location.
+          </Typography>
+        )}
         <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', mb: 2 }}>
           {allCategories.map(cat => (
             <Chip
@@ -223,7 +265,7 @@ const Map = () => {
             <DrawControl onShapeCreated={layer => setShapeFilter(layer)} />
 
             {userLocation && (
-              <Marker position={[userLocation.lat, userLocation.lng]} icon={createDivIcon('#000')}>
+              <Marker position={[userLocation.lat, userLocation.lng]} icon={createUserIcon()}>
                 <Popup>You're here</Popup>
               </Marker>
             )}
