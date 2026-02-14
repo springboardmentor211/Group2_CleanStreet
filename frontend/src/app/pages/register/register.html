@@ -1,0 +1,200 @@
+<div class="register-container">
+  <div class="register-illustration">
+    <div class="illustration-content">
+      <h2>Join CleanStreet Today</h2>
+      <p>Become part of our growing community dedicated to creating cleaner, greener neighborhoods. Together we can make a difference!</p>
+      
+      <ul class="features-list">
+        <li><i class="fas fa-check-circle"></i> Report cleanliness issues in your area</li>
+        <li><i class="fas fa-check-circle"></i> Track progress of reported issues</li>
+        <li><i class="fas fa-check-circle"></i> Stay informed about community initiatives</li>
+        <li><i class="fas fa-check-circle"></i> Connect with local volunteers</li>
+        <li><i class="fas fa-check-circle"></i> Help create cleaner, safer neighborhoods</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="register-form-container">
+    <h2>Create Your Account</h2>
+    <p class="register-subtitle">Register as a Community Member to start making a difference</p>
+    
+    <!-- User Type Badge -->
+    <div class="user-type-badge">
+      <i class="fas fa-user"></i> Community Member Account
+    </div>
+    
+    <!-- Error Message -->
+    <div class="error-message" [class.show]="showError">
+      <i class="fas fa-exclamation-circle"></i> {{errorMessage}}
+    </div>
+    
+    <!-- Success Message -->
+    <div class="success-message" [class.show]="showSuccess">
+      <i class="fas fa-check-circle"></i> {{successMessage}}
+    </div>
+    
+    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName" class="required">First Name</label>
+          <div class="input-with-icon">
+            <i class="fas fa-user"></i>
+            <input type="text" id="firstName" class="form-control" 
+                   placeholder="Enter your first name" 
+                   formControlName="firstName"
+                   [class.is-invalid]="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
+          </div>
+          <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)" 
+               class="error-text">
+            <span *ngIf="firstName?.errors?.['required']">First name is required</span>
+            <span *ngIf="firstName?.errors?.['minlength']">Minimum 2 characters required</span>
+            <span *ngIf="firstName?.errors?.['pattern']">Only letters allowed</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="lastName" class="required">Last Name</label>
+          <div class="input-with-icon">
+            <i class="fas fa-user"></i>
+            <input type="text" id="lastName" class="form-control" 
+                   placeholder="Enter your last name" 
+                   formControlName="lastName"
+                   [class.is-invalid]="lastName?.invalid && (lastName?.dirty || lastName?.touched)">
+          </div>
+          <div *ngIf="lastName?.invalid && (lastName?.dirty || lastName?.touched)" 
+               class="error-text">
+            <span *ngIf="lastName?.errors?.['required']">Last name is required</span>
+            <span *ngIf="lastName?.errors?.['minlength']">Minimum 2 characters required</span>
+            <span *ngIf="lastName?.errors?.['pattern']">Only letters allowed</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="email" class="required">Email Address</label>
+        <div class="input-with-icon">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="email" class="form-control" 
+                 placeholder="Enter your email address" 
+                 formControlName="email"
+                 [class.is-invalid]="email?.invalid && (email?.dirty || email?.touched)">
+        </div>
+        <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" 
+             class="error-text">
+          <span *ngIf="email?.errors?.['required']">Email is required</span>
+          <span *ngIf="email?.errors?.['email']">Please enter a valid email address</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="phone">Phone Number (Optional)</label>
+        <div class="input-with-icon">
+          <i class="fas fa-phone"></i>
+          <input type="tel" id="phone" class="form-control" 
+                 placeholder="Enter 10-digit phone number" 
+                 formControlName="phone"
+                 [class.is-invalid]="phone?.invalid && (phone?.dirty || phone?.touched)">
+        </div>
+        <div *ngIf="phone?.invalid && (phone?.dirty || phone?.touched)" 
+             class="error-text">
+          <span *ngIf="phone?.errors?.['pattern']">Please enter a valid 10-digit phone number</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="address" class="required">Address</label>
+        <div class="input-with-icon">
+          <i class="fas fa-map-marker-alt"></i>
+          <input type="text" id="address" class="form-control" 
+                 placeholder="Enter your street address" 
+                 formControlName="address"
+                 [class.is-invalid]="address?.invalid && (address?.dirty || address?.touched)">
+        </div>
+        <div *ngIf="address?.invalid && (address?.dirty || address?.touched)" 
+             class="error-text">
+          <span *ngIf="address?.errors?.['required']">Address is required</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="neighborhood">Neighborhood/Area (Optional)</label>
+        <div class="input-with-icon">
+          <i class="fas fa-map-pin"></i>
+          <input type="text" id="neighborhood" class="form-control" 
+                 placeholder="Enter your neighborhood or area" 
+                 formControlName="neighborhood">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password" class="required">Password</label>
+        <div class="input-with-icon">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="password" class="form-control" 
+                 placeholder="Create a secure password" 
+                 formControlName="password"
+                 [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)">
+        </div>
+        <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" 
+             class="error-text">
+          <span *ngIf="password?.errors?.['required']">Password is required</span>
+          <span *ngIf="password?.errors?.['minlength']">Minimum 8 characters required</span>
+          <span *ngIf="password?.errors?.['weakPassword']">Use uppercase, lowercase, and numbers</span>
+        </div>
+        <div class="password-strength" [ngClass]="getPasswordStrengthClass()" *ngIf="password?.value">
+          <i class="fas fa-shield-alt"></i> Password strength: {{passwordStrengthText}}
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword" class="required">Confirm Password</label>
+        <div class="input-with-icon">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="confirmPassword" class="form-control" 
+                 placeholder="Confirm your password" 
+                 formControlName="confirmPassword"
+                 [class.is-invalid]="(confirmPassword?.invalid || registrationForm.errors?.['passwordMismatch']) && (confirmPassword?.dirty || confirmPassword?.touched)">
+        </div>
+        <div *ngIf="(confirmPassword?.invalid || registrationForm.errors?.['passwordMismatch']) && (confirmPassword?.dirty || confirmPassword?.touched)" 
+             class="error-text">
+          <span *ngIf="confirmPassword?.errors?.['required']">Please confirm your password</span>
+          <span *ngIf="registrationForm.errors?.['passwordMismatch']">Passwords do not match</span>
+        </div>
+      </div>
+      
+      <div class="terms-conditions">
+        <input type="checkbox" id="terms" formControlName="agreedToTerms">
+        <label for="terms">
+          I agree to the <a href="#" (click)="showTerms(); $event.preventDefault()">Terms and Conditions</a> and 
+          <a href="#" (click)="showPrivacy(); $event.preventDefault()">Privacy Policy</a> of CleanStreet
+        </label>
+        <div *ngIf="agreedToTerms?.invalid && agreedToTerms?.touched" class="error-text">
+          <span>You must agree to the Terms and Conditions</span>
+        </div>
+      </div>
+      
+      <div class="terms-conditions">
+        <input type="checkbox" id="newsletter" formControlName="subscribeNewsletter">
+        <label for="newsletter">
+          Subscribe to CleanStreet newsletter for updates on community events and initiatives
+        </label>
+      </div>
+      
+      <div class="terms-conditions">
+        <input type="checkbox" id="volunteerInterest" formControlName="volunteerInterest">
+        <label for="volunteerInterest">
+          I'm interested in volunteering for cleanup events (optional)
+        </label>
+      </div>
+      
+      <button type="submit" class="btn-register" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Create Community Member Account</span>
+        <span *ngIf="isLoading"><i class="fas fa-spinner fa-spin"></i> Creating Account...</span>
+      </button>
+    </form>
+    
+    <div class="login-link">
+      <p>Already have an account? <a routerLink="/login">Sign in here</a></p>
+    </div>
+  </div>
+</div>

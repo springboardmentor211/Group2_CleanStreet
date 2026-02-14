@@ -1,0 +1,148 @@
+ <header>
+        <div class="container header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div>
+                    <div class="logo-text">Clean<span>Street</span></div>
+                    <div class="tagline">Keeping our communities green and clean</div>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="#"><i class="fas fa-handshake"></i> Get Involved</a></li>
+                    <li><a href="#"><i class="fas fa-envelope"></i> Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container hero-content">
+            <h1>Join the Movement for Cleaner, Greener Streets</h1>
+            <p>CleanStreet connects community members, volunteers, and local authorities to transform public spaces into clean, safe, and beautiful areas for everyone to enjoy.</p>
+            <button class="btn-hero" (click) ="scrollToCards()">Get Started <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </section>
+
+    <section class="intro">
+        <div class="container intro-content">
+            <h2 class="section-title">Our Mission</h2>
+            <p class="intro-text">
+                <span class="highlight">CleanStreet</span> is a community-driven initiative that brings together residents, volunteers, and local administrators to maintain clean and green neighborhoods. 
+                We believe that <span class="highlight">clean environments</span> foster healthier communities and improve quality of life for all residents. 
+                Whether you want to report an issue, volunteer for cleanup activities, or manage community initiatives, 
+                CleanStreet provides the platform to make a <span class="highlight">tangible difference</span> in your local area.
+            </p>
+        </div>
+    </section>
+
+    <section class="cards-section" id="role-cards">
+        <div class="container">
+            <h2 class="section-title">Choose Your Role</h2>
+            <p class="intro-text" style="text-align: center; max-width: 800px; margin: 20px auto 0;">
+                Select your role to get started with CleanStreet. Each role plays a vital part in keeping our communities clean and beautiful.
+            </p>
+            
+            <div class="cards-container">
+                <!-- User Card -->
+                <div class="card" [class.selected]="selectedRole === 'user'">
+
+                    <div class="card-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Community Member</h3>
+                        <p class="card-description">
+                            Report cleanliness issues in your neighborhood, track resolution progress, and participate in community initiatives to maintain clean public spaces.
+                        </p>
+                        <button class="btn-card" (click)="selectRole('user')">
+                            <span *ngIf="selectedRole !== 'user'">Select as User</span>
+                            <span *ngIf="selectedRole === 'user'"><i class="fas fa-check"></i> Selected</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Volunteer Card -->
+                <div class="card" [class.selected]="selectedRole === 'volunteer'">
+                    <div class="card-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Volunteer</h3>
+                        <p class="card-description">
+                            Join cleanup drives, participate in green initiatives, and contribute directly to transforming your community. Connect with fellow eco-warriors.
+                        </p>
+                        <button class="btn-card" (click)="selectRole('volunteer')">
+                            <span *ngIf="selectedRole !== 'volunteer'">Become a Volunteer</span>
+                            <span *ngIf="selectedRole === 'volunteer'"><i class="fas fa-check"></i> Selected</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Admin Card -->
+                <div class="card" [class.selected]="selectedRole === 'admin'">
+                    <div class="card-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">Administrator</h3>
+                        <p class="card-description">
+                            Manage reported issues, coordinate volunteer activities, oversee cleanliness projects, and ensure efficient resolution of community concerns.
+                        </p>
+                        <button class="btn-card" (click)="selectRole('admin')">
+                            <span *ngIf="selectedRole !== 'admin'">Admin Access</span>
+                            <span *ngIf="selectedRole === 'admin'"><i class="fas fa-check"></i> Selected</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Selected Role Information -->
+            <div class="selected-role" *ngIf="selectedRole">
+                <h3>You've selected: <span class="role-highlight">{{getRoleName()}}</span></h3>
+                <p>{{getRoleDescription()}}</p>
+                <button class="btn-hero" style="margin-top: 20px; padding: 12px 30px;" (click)="continueWithRole()">
+                    Continue as {{getRoleName()}} <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>CleanStreet</h4>
+                    <p>Making our communities cleaner and greener, one street at a time. Join us in our mission to create sustainable, beautiful neighborhoods for everyone.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <a href="#">About Us</a>
+                    <a href="#">Our Initiatives</a>
+                    <a href="#">Success Stories</a>
+                    <a href="#">Upcoming Events</a>
+                    <a href="#">Partners</a>
+                </div>
+                <div class="footer-column">
+                    <h4>Contact Us</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Green Street, Eco City</p>
+                    <p><i class="fas fa-phone"></i> (123) 456-7890</p>
+                    <p><i class="fas fa-envelope"></i> info@cleanstreet.org</p>
+                    <p><i class="fas fa-clock"></i> Mon-Fri: 9am-5pm</p>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 CleanStreet Initiative. All rights reserved. | Designed with <i class="fas fa-heart" style="color:#8bc34a;"></i> for our planet.
+            </div>
+        </div>
+    </footer>
