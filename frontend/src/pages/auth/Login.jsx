@@ -294,7 +294,7 @@ const Login = () => {
                   to="/forgot-password"
                   style={{ 
                     textDecoration: 'none',
-                    color: theme.palette.text.secondary,
+                    color: theme.palette.primary.main,
                     fontSize: '0.875rem',
                     fontWeight: 500,
                     '&:hover': {
